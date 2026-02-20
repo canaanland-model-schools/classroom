@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Portal · Login</title>
+      <link rel="icon" type="image/x-icon" href="fav_icon2.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: url('https://images.unsplash.com/photo-1581092921461-39b9c1e4fdd0?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }*/
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+       
+            body {
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          font-family: 'Jost', sans-serif;
+          background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+          background-image: url("img/computerlab1.jpg");
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            padding: 2rem 2rem 2.5rem;
+            border-radius: 32px;
+            box-shadow: 0 25px 40px -10px rgba(0, 20, 30, 0.4);
+            margin: 20px;
+            border: 1px solid rgba(255,255,240,0.6);
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            background: #0b2f4e;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .school-name {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #0b2f4e;
+            letter-spacing: 0.5px;
+        }
+
+        .school-motto {
+            font-size: 0.8rem;
+            color: #2c3e50;
+            opacity: 0.8;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 40px;
+            background: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            font-size: 1rem;
+            outline: 1px solid transparent;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: 2px solid #0b2f4e;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 40px;
+            background: #0b2f4e;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 8px 16px -6px #0b2f4e80;
+        }
+
+        .btn-login:hover {
+            background: #154b6e;
+        }
+
+        .error-message {
+            color: #b91c1c;
+            background: #fee2e2;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div class="login-container">
+        <div class="logo-area">
+             <!--<div>
+                  <img src="img/Ctemplogo.png" style="margin-bottom:15px; width: 400px; height: 120px" />
+              </div>-->
+            <div class="logo"><img src="img/Ctemplogo.png" style="margin-bottom:15px; width: 400px; height: 120px" /></div>
+            <div class="school-name">CLASS ROOM PORTAL</div>
+            <div class="school-motto">CANAANLAND SCHOOLS CLASS LESSON PORTAL</div>
+        </div>
+
+        <div class="input-group">
+            <label><i class="far fa-user" style="margin-right:6px;"></i> Username</label>
+            <input type="text" id="login-username" placeholder="Enter your Username Here" value="">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-lock" style="margin-right:8px;"></i> Password</label>
+            <input type="password" id="login-password" placeholder="" value="">
+        </div>
+
+        <button class="btn-login" id="login-btn"><i class="fas fa-arrow-right-to-bracket" style="margin-right:8px;"></i> Access dashboard</button>
+
+        <div id="login-error" class="error-message" style="display: none;">Invalid credentials</div>
+        <!--<div style="margin-top: 20px; font-size:0.8rem; text-align:center; color:#334155;">static demo: labtech / lab123 • admin / admin456</div>-->
+    </div>
+
+    <script>
+        // ---------- STATIC ARRAY OF USERNAMES AND PASSWORDS ----------
+        const validUsers = [
+           
+            { username: 'admin', password: 'admin', image: 'admin.png' },
+            // JSS1 STUDENTS
+                                                //JSS1 BOYS 
+                    {username:'FELIX VICTOR', password: 'cmgs101', image: 'cmgs101.jpg'},
+                    {username:'ALPHA TRINITY', password: 'cmgs102', image: 'cmgs102.jpg'}, 
+                    {username:'OGUNDIPE SEUN', password: 'cmgs103', image: 'cmgs103.jpg'},
+                    {username:'ABIODUN DARASIMI', password: 'cmgs104', image: 'cmgs104.jpg'},
+                    {username:'IBEGBU EMMANUEL', password: 'cmgs105', image: 'cmgs105.jpg'},
+                    {username:'AJAYI CONVENANT', password: 'cmgs106', image: 'cmgs106.jpg'},
+                    {username:'FADIREPO ELIZABETH', password: 'cmgs107', image: 'cmgs107.jpg'},
+
+
+                    //JSS1 GIRLS
+
+                    {username:'DAVID GRACE', password: 'cmgs108', image: 'cmgs108.jpg'},
+                    {username:'ADEPOJU KEMISOLA', password: 'cmgs109', image: 'cmgs109.jpg'}, 
+                    {username:'AYODELE ADEIFE PEACE', password: 'cmgs110', image: 'cmgs110.jpg'},
+                    {username:'FAKOREDE FIKAYO ESTHER', password: 'cmgs111', image: 'cmgs111.jpg'},
+                    {username:'ADEWUNMI DARASIMI', password: 'cmgs112', image: 'cmgs112.jpg'},
+
+
+
+
+                    //JSS2 BOYS 
+                    {username:'OJO AYOMIDE',  password: 'cmgs201', image: 'cmgs201.jpg'},
+                    {username:'OLATISE EXCEL', password: 'cmgs202', image: 'cmgs202.jpg'}, 
+                    {username:'ADEWUNMI TUNMISE', password: 'cmgs203', image: 'cmgs203.jpg'},
+                    {username:'EYEBIOKIN TOBILOBA', password: 'cmgs204', image: 'cmgs204.jpg'},
+                    {username:'OLUWAFEMI NIFEMI', password: 'cmgs205', image: 'cmgs205.jpg'},
+                    {username:'OLUWATUYI OLAMIDE', password: 'cmgs206', image: 'cmgs206.jpg'},
+                    {username:'ABIODUN PRAISE', password: 'cmgs207', image: 'cmgs207.jpg'},
+                    {username:'ADEJUMO ADENIKE', password: 'cmgs208', image: 'cmgs208.jpg'},
+                    {username:'DAVID MERCY', password: 'cmgs209', image: 'cmgs209.jpg'},
+                    {username:'OLUSANYA SEMILORE', password: 'cmgs210', image: 'cmgs210.jpg'},
+                    {username:'AJIBOLA DEMILADE', password: 'cmgs211', image: 'cmgs211.jpg'},
+                    {username:'AFENI DUNUSINMI', password: 'cmgs212', image: 'cmgs212.jpg'},
+                    {username:'BASHIRU QUDUS', password: 'cmgs213', image: 'cmgs213.jpg'},
+                    {username:'OWOLABI OLAMIDE', password: 'cmgs214', image: 'cmgs214.jpg'},
+                    {username:'ERINFOLAMI PRECIOUS', password: 'cmgs215', image: 'cmgs215.jpg'},
+                    {username:'AJIBOYE AANU', password: 'cmgs216', image: 'cmgs216.jpg'},
+                    {username:'ISA GODIYA AYOMIKUN', password: 'cmgs217', image: 'cmgs217.jpg'},
+
+
+                     
+                    //JSS3 BOYS
+                    {username:'ABDULLAH KEHINDE', password: 'cmgs301', image: 'cmgs301.jpg'},
+                    {username:'ABIODUN PAUL', password: 'cmgs302', image: 'cmgs302.jpg'},
+                    {username:'ALUKO RICHARD TAIWO', password: 'cmgs303', image: 'cmgs303.jpg'},
+                    {username:'OJO EMMANUEL', password: 'cmgs304', image: 'cmgs304.jpg'},
+                    {username:'OLAJIDE DANIEL', password: 'cmgs305', image: 'cmgs305.jpg'},
+                    {username:'OLANREWAJU ISREAL', password: 'cmgs306', image: 'cmgs306.jpg'},
+                    {username:'OLATUNJI SAMUEL', password: 'cmgs307', image: 'cmgs307.jpg'},
+                    {username:'HARRIS PEACE', password: 'cmgs308', image: 'cmgs308.jpg'},
+
+
+                    {username:'ABDULLAH TAIWO', password: 'cmgs309', image: 'cmgs309.jpg'},
+                    {username:'ADEJUMO AZEEZAT', password: 'cmgs310', image: 'cmgs310.jpg'},
+                    {username:'AJOGO ESTHER', password: 'cmgs311', image: 'cmgs311.jpg'}, 
+                    {username:'ALONGE AYANFEOLUWA', password: 'cmgs312', image: 'cmgs312.jpg'},
+                    {username:'ALUKO RICHARD KEHINDE', password: 'cmgs313', image: 'cmgs313.jpg'},
+                    {username:'ASAOLU SEFUNMI', password: 'cmgs314', image: 'cmgs314.jpg'},
+                    {username:'AYODELE SEKEMI', password: 'cmgs315', image: 'cmgs315.jpg'},
+                    {username:'ISA GODIYA', password: 'cmgs316', image: 'cmgs316.jpg'},
+                    {username:'OKUNOLA DARASIMI', password: 'cmgs317', image: 'cmgs317.jpg'},
+                    {username:'OYINLOYE IBIRONKE', password: 'cmgs318', image: 'cmgs318.jpg'},
+                    {username:'SESAN OJO WISDOM', password: 'cmgs319', image: 'cmgs319.jpg'},
+
+                    
+
+                      //SS1 BOYS 
+                    {username:'JOHN GOODNESS', password: 'cmgs401', image: 'cmgs401.jpg' },
+                    {username:'IBEGBU CYNTHIA', password: 'cmgs402', image: 'cmgs402.jpg' },
+                    {username:'ENIAFE SUCCESS', password: 'cmgs403', image: 'cmgs403.jpg' },
+                    {username:'ISA HAUWA KEZIA', password: 'cmgs404', image: 'cmgs404.jpg' },
+                    {username:'BEST DANIEL', password: 'cmgs405', image: 'cmgs405.jpg' },
+                    {username:'OGUNDANA HENRY', password: 'cmgs406', image: 'cmgs406.jpg' }, 
+                    {username:'OLAMIDE OLUWASEUN', password: 'cmgs407', image: 'cmgs407.jpg' }, 
+
+
+                  
+
+                    //SS2 BOYS 
+                    {username:'ALUKO CROWN RICHARD', password: 'cmgs501', image: 'cmgs501.jpg'},
+                    {username:'ADEJUMO SODIQ', password: 'cmgs502', image: 'cmgs502.jpg'},
+                    {username:'AMBROSE GODWIN', password: 'cmgs503', image: 'cmgs503.jpg'},
+                    {username:'BELLO GEORGE', password: 'cmgs504', image: 'cmgs504.jpg'},
+                    {username:'FADIREPO SEMILORE', password: 'cmgs505', image: 'cmgs505.jpg'},
+                    {username:'OKE DAVID', password: 'cmgs506', image: 'cmgs506.jpg'},
+
+                    //SS2 GIRLS
+                    {username:'ADEOYE DIVINE', password: 'cmgs507', image: 'cmgs507.jpg'},
+                    {username:'AWOOBIYE ENIOLA', password: 'cmgs508', image: 'cmgs508.jpg'},
+                    {username:'KAYODE RACHEAL', password: 'cmgs509', image: 'cmgs509.jpg'},
+                    {username:'OJO ENIOPE', password: 'cmgs510', image: 'cmgs510.jpg'}, 
+                    {username:'OGUNDIPE BLESSING', password: 'cmgs511', image: 'cmgs511.jpg'},
+                    {username:'OLANREWAJU HEPZIBAH', password: 'cmgs512', image: 'cmgs512.jpg'},
+                    {username:'OSASONO ARIKE DESOLA', password: 'cmgs513', image: 'cmgs513.jpg'},
+
+
+                    //SS3 BOYS 
+                    {username:'OLTUNJI EMMANUEL', password: 'cmgs601', image: 'cmgs601.jpg'},
+                    {username:'ADEWUNMI NIFEMI', password: 'cmgs602', image: 'cmgs602.jpg'}, 
+                    {username:'OLUWAFEMI OLUWATOMIWA', password: 'cmgs603', image: 'cmgs603.jpg'},
+                    {username:'FOLUSO BOLUWATITO', password: 'cmgs604', image: 'cmgs604.jpg'},
+                    {username:'ADEJUMO AZEEZ', password: 'cmgs605', image: 'cmgs605.jpg'},
+
+                    //SS3 GIRLS
+                    {username:'AJAYI SANDRA', password: 'cmgs606', image: 'cmgs606.jpg'},
+                    {username:'OMOLE SEFUNMI', password: 'cmgs607', image: 'cmgs607.jpg'},
+                    {username:'AYEBEGAN AYOBAMI', password: 'cmgs608', image: 'cmgs608.jpg'},
+                    {username:'OJO SUCCESS', password: 'cmgs609', image: 'cmgs609.jpg'}     
+                    // ADMIN (optional)
+                  
+            ];
+
+
+    
+
+        const loginBtn = document.getElementById('login-btn');
+        const usernameInp = document.getElementById('login-username');
+        const passwordInp = document.getElementById('login-password');
+        const errorDiv = document.getElementById('login-error');
+
+        loginBtn.addEventListener('click', function() {
+            const username = usernameInp.value.trim();
+            const password = passwordInp.value.trim();
+
+            const foundUser = validUsers.find(u => u.username === username && u.password === password);
+
+            if (foundUser) {
+                // Store user data in sessionStorage for dashboard to access
+                sessionStorage.setItem('loggedUser', JSON.stringify(foundUser));
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                errorDiv.style.display = 'block';
+            }
+        });
+
+        // Enter key support
+        passwordInp.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginBtn.click();
+        });
+
+
+         // ================== ANTI-CHEAT & LOGOUT ==================
+        document.addEventListener('keydown', function (event) {
+            const key = event.key.toLowerCase();
+            if ((event.ctrlKey && (key === 'p' || key === 's')) && currentSection === 'objectives') {
+                event.preventDefault();
+                alert("Right-click and view source are disabled during examination.");
+                return false;
+            }
+        });
+       
+        document.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            alert("Right-click is disabled during examination.");
+        });
+       
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'u')) {
+                e.preventDefault();
+                alert("Developer tools are disabled during examination.");
+            }
+        });
+    </script>
+</body>
+</html>
