@@ -339,7 +339,10 @@
                         <label>📆 Session</label>
                         <select id="sessionSelect">
                             <option value="2025-2026">2025-2026</option>
-                            <!--<option value="2026-2027">2026-2027</option>-->
+                            <option value="2026-2027">2026-2027</option>
+                            <option value="2027-2028">2027-2028</option>
+                            <option value="2028-2029">2028-2029</option>
+                            <option value="2029-2030">2029-2030</option>
                         </select>
                     </div>
                     <div class="select-block">
@@ -356,17 +359,17 @@
                     <div class="select-block">
                         <label>📝 Term</label>
                         <select id="termSelect">
-                            <!--<option value="First_Term">First Term</option>-->
+                            <option value="First_Term">First Term</option>
                             <option value="Second_Term">Second Term</option>
-                            <!--<option value="Third_Term">Third Term</option>-->
+                            <option value="Third_Term">Third Term</option>
                         </select>
                     </div>
                     <div class="select-block">
                         <label>🧪 Subject</label>
                         <select id="subjectSelect">
                             <option value="Mathematics">Mathematics</option>
-                            <!--<option value="English Language">English Language</option>-->
-                            <!--<option value="Computer Studies">Computer Studies</option>-->
+                            <option value="English Language">English Language</option>
+                            <option value="Computer Studies">Computer Studies</option>
                             <option value="Digital Technology">Digital Technology</option>
                         </select>
                     </div>
@@ -399,167 +402,189 @@
         </div>
     </div>
 
-    <script>
-        // ---------- STATIC PASSWORD MAP ----------
-        const weekPasswordMap = new Map();
+   <script>
+    // ---------- STATIC PASSWORD MAP ----------
+    const weekPasswordMap = new Map();
 
-        // Generate all combinations - UPDATED with hyphen in sessions
-        const sessions = ['2025-2026', '2026-2027'];
-        const classes = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
-        const terms = ['First_Term', 'Second_Term', 'Third_Term'];
-        const subjects = ['Mathematics', 'English Language', 'Computer Studies', 'Digital Technology'];
+    // Generate all combinations - UPDATED with hyphen in sessions
+    const sessions = ['2025-2026', '2026-2027','2027-2028','2028-2029','2029-2030'];
+    const classes = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
+    const terms = ['First_Term', 'Second_Term', 'Third_Term'];
+    const subjects = ['Mathematics', 'English Language', 'Computer Studies', 'Digital Technology'];
 
-        // Populate password map
-        sessions.forEach(s => {
-            classes.forEach(c => {
-                terms.forEach(t => {
-                    subjects.forEach(sub => {
-                        for (let w = 1; w <= 14; w++) {
-                            let mapKey = `${s}_${c}_${t}_${sub}_Week${w}`;
-                            let simplePass = '';
-                            if (sub === 'Mathematics') simplePass = `math${w}`;
-                            else if (sub === 'English Language') simplePass = `eng${w}`;
-                            else if (sub === 'Computer Studies') simplePass = `comp${w}`;
-                            else if (sub === 'Digital Technology') simplePass = `digi${w}`;
-                            weekPasswordMap.set(mapKey, simplePass);
-                        }
-                    });
+    // Populate password map
+    sessions.forEach(s => {
+        classes.forEach(c => {
+            terms.forEach(t => {
+                subjects.forEach(sub => {
+                    for (let w = 1; w <= 9; w++) {
+                        let mapKey = `${s}_${c}_${t}_${sub}_Week${w}`;
+                        let simplePass = '';
+                        if (sub === 'Mathematics') simplePass = `math${w}`;
+                        else if (sub === 'English Language') simplePass = `eng${w}`;
+                        else if (sub === 'Computer Studies') simplePass = `comp${w}`;
+                        else if (sub === 'Digital Technology') simplePass = `digi${w}`;
+                        weekPasswordMap.set(mapKey, simplePass);
+                    }
                 });
             });
         });
+    });
 
-        // ---------- CHECK LOGIN SESSION ----------
-        const loggedUser = JSON.parse(sessionStorage.getItem('loggedUser'));
+    // ---------- FUNCTION TO CHECK IF PAGE EXISTS ----------
+    async function checkPageExists(url) {
+        try {
+            const response = await fetch(url, { method: 'HEAD' });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    // ---------- FUNCTION TO HANDLE REDIRECTION WITH FALLBACK ----------
+    async function redirectToPage(primaryUrl, fallbackUrl = 'default.html') {
+        const exists = await checkPageExists(primaryUrl);
         
-        // Redirect to login if no user found
-        if (!loggedUser) {
-            window.location.href = 'index.html';
+        if (exists) {
+            window.location.href = primaryUrl;
+        } else {
+            console.warn(`Page ${primaryUrl} not found, redirecting to ${fallbackUrl}`);
+            window.location.href = fallbackUrl;
+        }
+    }
+
+    // ---------- CHECK LOGIN SESSION ----------
+    const loggedUser = JSON.parse(sessionStorage.getItem('loggedUser'));
+    
+    // Redirect to login if no user found
+    if (!loggedUser) {
+        window.location.href = 'index.html';
+    }
+
+    // ---------- POPULATE USER INFO ----------
+    const welcomeRow = document.getElementById('userWelcome');
+    const welcomeUsername = document.getElementById('welcomeUsername');
+    
+    welcomeUsername.textContent = loggedUser.username;
+    welcomeRow.innerHTML = `
+        <span class="username-display"><i class="far fa-smile"></i> ${loggedUser.username}</span>
+        <img src="img/${loggedUser.image}" alt="user" class="user-img" onerror="this.src='https://via.placeholder.com/48?text=User';">
+    `;
+    
+    // ---------- POPULATE WEEK SELECT (1-14) ----------
+    const weekSelect = document.getElementById('weekSelect');
+    for (let i = 1; i <= 9; i++) {
+        const option = document.createElement('option');
+        option.value = `Week${i}`;
+        option.textContent = `Week ${i}`;
+        weekSelect.appendChild(option);
+    }
+
+    // ---------- DASHBOARD EVENT LISTENERS ----------
+    const redirectBtn = document.getElementById('redirectBtn');
+    const sessionSel = document.getElementById('sessionSelect');
+    const classSel = document.getElementById('classSelect');
+    const termSel = document.getElementById('termSelect');
+    const subjectSel = document.getElementById('subjectSelect');
+    const weekSel = document.getElementById('weekSelect');
+    const passInput = document.getElementById('weekPassInput');
+    const msgDiv = document.getElementById('redirectMessage');
+
+    // Prefill password function
+    function prefillTestPassword() {
+        const session = sessionSel.value;
+        const className = classSel.value;
+        const term = termSel.value;
+        const subject = subjectSel.value;
+        const week = weekSel.value;
+        const key = `${session}_${className}_${term}_${subject}_${week}`;
+        const pass = weekPasswordMap.get(key);
+        if (pass && passInput) {
+            passInput.value = pass;
+        }
+    }
+
+    // Redirect button click handler - UPDATED with fallback
+    redirectBtn.addEventListener('click', async function() {
+        const session = sessionSel.value;
+        const className = classSel.value;
+        const term = termSel.value;
+        const subject = subjectSel.value;
+        const week = weekSel.value;
+
+        const mapKey = `${session}_${className}_${term}_${subject}_${week}`;
+        const expectedPassword = weekPasswordMap.get(mapKey);
+        const enteredPass = passInput.value.trim();
+
+        if (!expectedPassword) {
+            msgDiv.innerHTML = '⚠️ No password defined for this combination.';
+            return;
         }
 
-        // ---------- POPULATE USER INFO ----------
-        const welcomeRow = document.getElementById('userWelcome');
-        const welcomeUsername = document.getElementById('welcomeUsername');
+        if (enteredPass !== expectedPassword) {
+            msgDiv.innerHTML = '❌ Incorrect week password. Try again.';
+            return;
+        }
+
+        // Build redirect URL with underscore for spaces in subject
+        const subjectForUrl = subject.replace(/ /g, '_');
+        const redirectUrl = `${session}_${className}_${term}_${subjectForUrl}_${week}_Class.html`;
         
-        welcomeUsername.textContent = loggedUser.username;
-        welcomeRow.innerHTML = `
-            <span class="username-display"><i class="far fa-smile"></i> ${loggedUser.username}</span>
-            <img src="img/${loggedUser.image}" alt="user" class="user-img" onerror="this.src='https://via.placeholder.com/48?text=User';">
-        `;
-         //OKO x OBO
-        // ---------- POPULATE WEEK SELECT (1-14) ----------
-        const weekSelect = document.getElementById('weekSelect');
-        for (let i = 1; i <= 1; i++) {
-            const option = document.createElement('option');
-            option.value = `Week${i}`;
-            option.textContent = `Week ${i}`;
-            weekSelect.appendChild(option);
-        }
+        msgDiv.innerHTML = `✅ Access granted! Checking if page exists...`;
 
-        // ---------- DASHBOARD EVENT LISTENERS ----------
-        const redirectBtn = document.getElementById('redirectBtn');
-        const sessionSel = document.getElementById('sessionSelect');
-        const classSel = document.getElementById('classSelect');
-        const termSel = document.getElementById('termSelect');
-        const subjectSel = document.getElementById('subjectSelect');
-        const weekSel = document.getElementById('weekSelect');
-        const passInput = document.getElementById('weekPassInput');
-        const msgDiv = document.getElementById('redirectMessage');
+        // Store current selections in sessionStorage for the class page to use
+        sessionStorage.setItem('currentClass', JSON.stringify({
+            session: session,
+            className: className,
+            term: term,
+            subject: subject,
+            week: week,
+            redirectUrl: redirectUrl
+        }));
 
-        // Prefill password function
-        function prefillTestPassword() {
-            const session = sessionSel.value;
-            const className = classSel.value;
-            const term = termSel.value;
-            const subject = subjectSel.value;
-            const week = weekSel.value;
-            const key = `${session}_${className}_${term}_${subject}_${week}`;
-            const pass = weekPasswordMap.get(key);
-            if (pass && passInput) {
-                passInput.value = pass;
-            }
-        }
+        // Check if page exists and redirect with fallback
+        setTimeout(async () => {
+            await redirectToPage(redirectUrl, 'default.html');
+        }, 800);
+    });
 
-        // Redirect button click handler
-        redirectBtn.addEventListener('click', function() {
-            const session = sessionSel.value;
-            const className = classSel.value;
-            const term = termSel.value;
-            const subject = subjectSel.value;
-            const week = weekSel.value;
+    // Prefill password when selections change
+    [sessionSel, classSel, termSel, subjectSel, weekSel].forEach(el => {
+        el.addEventListener('change', prefillTestPassword);
+    });
 
-            const mapKey = `${session}_${className}_${term}_${subject}_${week}`;
-            const expectedPassword = weekPasswordMap.get(mapKey);
-            const enteredPass = passInput.value.trim();
+    // Initial prefill
+    setTimeout(prefillTestPassword, 100);
 
-            if (!expectedPassword) {
-                msgDiv.innerHTML = '⚠️ No password defined for this combination.';
-                return;
-            }
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        sessionStorage.removeItem('loggedUser');
+        sessionStorage.removeItem('currentClass');
+        window.location.href = 'index.html';
+    });
 
-            if (enteredPass !== expectedPassword) {
-                msgDiv.innerHTML = '❌ Incorrect week password. Try again.';
-                return;
-            }
-
-            // Build redirect URL with underscore for spaces in subject
-            const subjectForUrl = subject.replace(/ /g, '_');
-            const redirectUrl = `${session}_${className}_${term}_${subjectForUrl}_${week}_Class.html`;
-            
-            msgDiv.innerHTML = `✅ Access granted! Redirecting to <strong>${redirectUrl}</strong> ...`;
-
-            // Store current selections in sessionStorage for the class page to use
-            sessionStorage.setItem('currentClass', JSON.stringify({
-                session: session,
-                className: className,
-                term: term,
-                subject: subject,
-                week: week,
-                redirectUrl: redirectUrl
-            }));
-
-            // Redirect to the class page
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 800);
-        });
-
-        // Prefill password when selections change
-        [sessionSel, classSel, termSel, subjectSel, weekSel].forEach(el => {
-            el.addEventListener('change', prefillTestPassword);
-        });
-
-        // Initial prefill
-        setTimeout(prefillTestPassword, 100);
-
-        // Logout functionality
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            sessionStorage.removeItem('loggedUser');
-            sessionStorage.removeItem('currentClass');
-            window.location.href = 'index.html';
-        });
-
-         // ================== ANTI-CHEAT & LOGOUT ==================
-        document.addEventListener('keydown', function (event) {
-            const key = event.key.toLowerCase();
-            if ((event.ctrlKey && (key === 'p' || key === 's')) && currentSection === 'objectives') {
-                event.preventDefault();
-                alert("Right-click and view source are disabled during examination.");
-                return false;
-            }
-        });
-       
-        document.addEventListener('contextmenu', (event) => {
+    // ================== ANTI-CHEAT & LOGOUT ==================
+    document.addEventListener('keydown', function (event) {
+        const key = event.key.toLowerCase();
+        if ((event.ctrlKey && (key === 'p' || key === 's')) && currentSection === 'objectives') {
             event.preventDefault();
-            alert("Right-click is disabled during examination.");
-        });
-       
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'u')) {
-                e.preventDefault();
-                alert("Developer tools are disabled during examination.");
-            }
-        });
-    </script>
+            alert("Right-click and view source are disabled during examination.");
+            return false;
+        }
+    });
+   
+    document.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        alert("Right-click is disabled during examination.");
+    });
+   
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+            (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'u')) {
+            e.preventDefault();
+            alert("Developer tools are disabled during examination.");
+        }
+    });
+</script>
 </body>
 </html>
