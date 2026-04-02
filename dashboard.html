@@ -339,10 +339,10 @@
                         <label>📆 Session</label>
                         <select id="sessionSelect">
                             <option value="2025-2026">2025-2026</option>
-                            <option value="2026-2027">2026-2027</option>
+                            <!--<option value="2026-2027">2026-2027</option>
                             <option value="2027-2028">2027-2028</option>
                             <option value="2028-2029">2028-2029</option>
-                            <option value="2029-2030">2029-2030</option>
+                            <option value="2029-2030">2029-2030</option>-->
                         </select>
                     </div>
                     <div class="select-block">
@@ -359,8 +359,8 @@
                     <div class="select-block">
                         <label>📝 Term</label>
                         <select id="termSelect">
-                            <option value="First_Term">First Term</option>
-                            <option value="Second_Term">Second Term</option>
+                            <!--<option value="First_Term">First Term</option>
+                            <option value="Second_Term">Second Term</option>-->
                             <option value="Third_Term">Third Term</option>
                         </select>
                     </div>
@@ -368,9 +368,9 @@
                         <label>🧪 Subject</label>
                         <select id="subjectSelect">
                             <option value="Mathematics">Mathematics</option>
-                            <option value="English Language">English Language</option>
-                            <option value="Computer Studies">Computer Studies</option>
-                            <option value="Digital Technology">Digital Technology</option>
+                            <!--<option value="English Language">English Language</option>
+                            <option value="Computer Studies">Computer Studies</option>-->
+                            <option value="Digital_Technology">Digital_Technology</option>
                         </select>
                     </div>
                     <div class="select-block">
@@ -392,7 +392,7 @@
                 <hr>
                 <!--<div class="info-note">
                     <i class="fas fa-info-circle"></i> Static demo: week password examples: "math3" for Mathematics week3, "digi1" for Digital Tech week1, "comp7" for Computer Studies week7, etc. <br>
-                    <strong>Test:</strong> 2025-2026, JSS1, First_Term, Digital Technology, Week1 → password "digi1" → redirects to 2025-2026_JSS1_First_Term_Digital_Technology_Week1_Class.html
+                    <strong>Test:</strong> 2025-2026, JSS1, First_Term, Digital_Technology, Week1 → password "digi1" → redirects to 2025-2026_JSS1_First_Term_Digital_Technology_Week1_Class.html
                 </div>-->
 
                     <div class="windows-activate">
@@ -410,7 +410,7 @@
     const sessions = ['2025-2026', '2026-2027','2027-2028','2028-2029','2029-2030'];
     const classes = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
     const terms = ['First_Term', 'Second_Term', 'Third_Term'];
-    const subjects = ['Mathematics', 'English Language', 'Computer Studies', 'Digital Technology'];
+    const subjects = ['Mathematics', 'English Language', 'Computer_Studies', 'Digital_Technology'];
 
     // Populate password map
     sessions.forEach(s => {
@@ -423,7 +423,7 @@
                         if (sub === 'Mathematics') simplePass = `math${w}`;
                         else if (sub === 'English Language') simplePass = `eng${w}`;
                         else if (sub === 'Computer Studies') simplePass = `comp${w}`;
-                        else if (sub === 'Digital Technology') simplePass = `digi${w}`;
+                        else if (sub === 'Digital_Technology') simplePass = `digi${w}`;
                         weekPasswordMap.set(mapKey, simplePass);
                     }
                 });
