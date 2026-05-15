@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="fav_icon2.ico">
+    <title>Classroom · Dashboard | Canaanland</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #eef2f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 15px;
+            position: relative;
+            z-index: 1;
+        }
+       
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('img/Ctemplogo.png') no-repeat center center;
+            background-size: 300px 300px;
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 3;
+        }
+       
+        .logo {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            border: 3px solid #f5b81b;
+        }
+        .logo img {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .dashboard-card {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 30px 50px -20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dash-header {
+            background: linear-gradient(135deg, #0b2f4e 0%, #1c4e6e 100%);
+            color: white;
+            padding: 1.2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .dash-logo {
+            background: #f5b81b;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #0b2f4e;
+        }
+
+        .welcome-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #cfddee;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .username-display {
+            font-weight: 600;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 18px;
+            border-radius: 40px;
+        }
+
+        .dash-body {
+            padding: 30px 30px 40px;
+            text-align: center;
+        }
+
+        .filter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+            background: #f8fafd;
+            padding: 25px;
+            border-radius: 28px;
+            justify-content: center;
+        }
+
+        .select-block {
+            flex: 1 1 200px;
+            min-width: 180px;
+        }
+
+        .select-block label {
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            display: block;
+            text-align: left;
+        }
+
+        .select-block select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ccd9e6;
+            border-radius: 30px;
+            background: white;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .select-block select:focus {
+            border-color: #0b2f4e;
+            box-shadow: 0 0 0 2px rgba(11,47,78,0.2);
+        }
+
+        /* Removed week-specific password section, simplified to access button */
+        .access-section {
+            background: #eef3fc;
+            border-radius: 28px;
+            padding: 25px 20px;
+            margin: 20px 0 25px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn-redirect {
+            background: #0b2f4e;
+            color: white;
+            padding: 16px 42px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 12px rgba(11,47,78,0.3);
+            white-space: nowrap;
+        }
+
+        .btn-redirect:hover {
+            background: #1f4b6e;
+            transform: scale(1.02);
+        }
+
+        .redirect-message {
+            margin-top: 16px;
+            font-weight: 500;
+            min-height: 50px;
+            color: #1e4b6e;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        hr {
+            margin: 30px 0 15px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 22px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
+
+        .windows-activate {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 40px;
+            color: #2c3e50;
+        }
+
+        .info-note {
+            background: #e8f0fe;
+            border-radius: 30px;
+            padding: 12px 18px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #0b2f4e;
+            display: inline-block;
+        }
+
+        @media (max-width: 750px) {
+            .dash-body { padding: 20px; }
+            .filter-grid { gap: 12px; }
+            .select-block { min-width: 150px; }
+            .btn-redirect { padding: 14px 28px; }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <!-- Logo top -->
+        <div class="logo-container">
+            <div class="logo">
+                <img src="img/Ctemplogo.png" alt="School Logo" onerror="this.src='https://placehold.co/90x90?text=CMS'">
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="dash-header">
+                <div class="header-left">
+                    <div class="dash-logo"><i class="fas fa-chalkboard-user"></i></div>
+                    <div style="font-size:1.3rem; font-weight:600;">CANAANLAND SCHOOLS<br><span style="font-size:0.8rem;">LESSON & CBT PORTAL</span></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="welcome-row" id="userWelcome"></div>
+                    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+            
+            <div class="dash-body">
+                <div style="font-size:1.9rem; font-weight:300; margin-bottom:8px;">👋 Hello, <span id="welcomeUsername" style="font-weight:600;"></span></div>
+                <p style="color:#2d4a6e; margin-bottom:10px;">Select <strong>Session, Class, Term, Subject</strong> → click launch to access lesson materials</p>
+                <p style="color:#4a6f8f; font-size:0.8rem; margin-bottom:5px;"><i class="fas fa-info-circle"></i> No week selection required. Direct subject-based redirect.</p>
+
+                <div class="filter-grid">
+                    <div class="select-block">
+                        <label>📆 Session</label>
+                        <select id="sessionSelect">
+                            <!--<option value="2025-2026">2025-2026</option>-->
+                            <option value="2026-2027">2026-2027</option>
+                            <option value="2027-2028">2027-2028</option>
+                            <option value="2028-2029">2028-2029</option>
+                            <option value="2029-2030">2029-2030</option>
+                        </select>
+                    </div>
+                    <div class="select-block">
+                        <label>📚 Class</label>
+                        <select id="classSelect">
+                            <option value="JSS1">JSS 1</option>
+                            <option value="JSS2">JSS 2</option>
+                            <option value="JSS3">JSS 3</option>
+                        </select>
+                    </div>
+                    <div class="select-block">
+                        <label>📝 Term</label>
+                        <select id="termSelect">
+                            <option value="First_Term">First Term</option>
+                            <option value="Second_Term">Second Term</option>
+                            <option value="Third_Term">Third Term</option>
+                        </select>
+                    </div>
+                    <div class="select-block">
+                        <label>🧪 Subject</label>
+                        <select id="subjectSelect"></select> <!-- dynamically filled -->
+                    </div>
+                </div>
+
+                <!-- Access button without password / week requirement -->
+                <div class="access-section">
+                    <button class="btn-redirect" id="redirectBtn"><i class="fas fa-book-open"></i> Launch Lesson →</button>
+                </div>
+
+                <div id="redirectMessage" class="redirect-message"></div>
+                <div class="info-note">
+                    <i class="fas fa-link"></i> URL pattern: Session_Class_Term_Subject.html (Week removed)
+                </div>
+                <hr>
+                <div class="windows-activate">
+                    <p>&copy; 2027 Canaanland Schools CBT · Streamlined subject access portal</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======================== COMPLETE SUBJECTS ARRAY (ALL OFFERED SUBJECTS) ========================
+        const MASTER_SUBJECTS = [
+            "Mathematics", "English_Language", "Literature_in_English", 
+            "Christian_Religious_Studies",  "Agricultural_Science", "Computer_Studies",
+            "Digital_Technology", "Basic_Science", "Basic_Technology", "Social_Studies", "Civic_Education",
+            "Business_Studies", "Home_Economics", "Food_and_Nutrition", "Cultural_and_Creative-Art",
+            "Fine_Art", "Music", "Yoruba", "French", "Physical_Health_Education", "Phonetics_&_Diction",
+            "Fashion_Design_&_Garment_Making", "Livestock_Farming", "Ekiti_Values", "Intermediate_Science",
+            "Nigerian_History",  "Data_Processing"
+        ];
+
+        // ======================== CHECK LOGGED USER ========================
+        const loggedUser = JSON.parse(sessionStorage.getItem('loggedUser'));
+        if (!loggedUser) {
+            window.location.href = 'index.html';
+        }
+
+        // Display user info
+        const welcomeRow = document.getElementById('userWelcome');
+        const welcomeUsernameSpan = document.getElementById('welcomeUsername');
+        welcomeUsernameSpan.textContent = loggedUser.username || "Student";
+        welcomeRow.innerHTML = `
+            <span class="username-display"><i class="far fa-smile"></i> ${loggedUser.username}</span>
+            <img src="img/${loggedUser.image || 'default.png'}" alt="user" class="user-img" onerror="this.src='https://ui-avatars.com/api/?background=0b2f4e&color=fff&name=${encodeURIComponent(loggedUser.username)}';">
+        `;
+
+        // ======================== POPULATE SUBJECT SELECT ========================
+        const subjectSelect = document.getElementById('subjectSelect');
+        MASTER_SUBJECTS.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+
+        // DOM references
+        const sessionSel = document.getElementById('sessionSelect');
+        const classSel = document.getElementById('classSelect');
+        const termSel = document.getElementById('termSelect');
+        const redirectBtn = document.getElementById('redirectBtn');
+        const msgDiv = document.getElementById('redirectMessage');
+
+        // Helper to format subject filename (safe for URL)
+        function formatSubjectForFile(subjectRaw) {
+            let subjectFile = subjectRaw.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '').replace(/\s+/g, '_');
+            // Specific mappings for consistency
+            if (subjectRaw === "Phonetics & Diction") subjectFile = "Phonetics_Diction";
+            if (subjectRaw === "Fashion Design & Garment Making") subjectFile = "Fashion_Design_Garment_Making";
+            if (subjectRaw === "Physical Health Education") subjectFile = "PHE";
+            if (subjectRaw === "Computer Studies") subjectFile = "Computer_Studies";
+            if (subjectRaw === "Cultural_and_Creative-Art") subjectFile = "Cultural_and_Creative_Art";
+            if (subjectRaw === "Literature_in_English") subjectFile = "Literature_in_English";
+            return subjectFile;
+        }
+
+        // ========== ASYNC PAGE CHECK WITH CORS-FRIENDLY & FALLBACK ==========
+        async function pageExists(url) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                const response = await fetch(url, { method: 'HEAD', signal: controller.signal });
+                clearTimeout(timeoutId);
+                return response.ok;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        async function redirectWithFallback(primaryUrl, fallbackUrl = 'lesson_unavailable.html') {
+            msgDiv.innerHTML = `⏳ Checking lesson availability...`;
+            const exists = await pageExists(primaryUrl);
+            if (exists) {
+                msgDiv.innerHTML = `✅ Lesson ready! Redirecting to: ${primaryUrl}`;
+                window.location.href = primaryUrl;
+            } else {
+                msgDiv.innerHTML = `⚠️ Material not yet available (${primaryUrl}). Redirecting to information page.`;
+                console.warn(`Missing lesson: ${primaryUrl}`);
+                window.location.href = fallbackUrl;
+            }
+        }
+
+        // ========== MAIN REDIRECT EVENT — NO WEEK, NO PASSWORD, ONLY SESSION/CLASS/TERM/SUBJECT ==========
+        redirectBtn.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const session = sessionSel.value;
+            const className = classSel.value;
+            const term = termSel.value;
+            const subject = subjectSelect.value;
+            
+            if (!subject) {
+                msgDiv.innerHTML = '❌ Please select a valid subject.';
+                return;
+            }
+            
+            // Sanitize class name (ensure no spaces or special chars)
+            let cleanClass = className.replace(/\s+/g, '');
+            let cleanTerm = term; // already like First_Term
+            let cleanSession = session;
+            
+            // Format subject for filename (underscores, safe)
+            const subjectFile = formatSubjectForFile(subject);
+            
+           
+            const redirectUrl = `${cleanSession}_${cleanClass}_${cleanTerm}/${cleanSession}_${cleanClass}_${cleanTerm}_${subjectFile}.html`;
+            
+            // Store context for target page (optional but useful)
+            sessionStorage.setItem('currentLessonContext', JSON.stringify({
+                session, className, term, subject,
+                redirectUrl: redirectUrl,
+                timestamp: new Date().toISOString()
+            }));
+            
+            msgDiv.innerHTML = `🚀 Launching lesson: ${subject} (${cleanClass} | ${term})...`;
+            setTimeout(async () => {
+                await redirectWithFallback(redirectUrl, 'lesson_unavailable.html');
+            }, 400);
+        });
+
+        // Optional: Additional message to confirm that week & password are removed
+        // Provide a small helper to show current selection preview
+        function updatePreviewMessage() {
+            const session = sessionSel.value;
+            const className = classSel.value;
+            const term = termSel.value;
+            const subject = subjectSelect.value;
+            if (subject) {
+                const subjFile = formatSubjectForFile(subject);
+                const previewUrl = `${session}_${className.replace(/\s/g,'')}_${term}_${subjFile}.html`;
+                // Do not force show intrusive, but keep in console or optional tooltip - but we can display subtle note
+                const existingNote = document.querySelector('.info-note');
+                if (existingNote && !existingNote.querySelector('.live-preview')) {
+                    // avoid spamming, just update text inside if needed
+                }
+            }
+        }
+        
+        // Add change listeners to refresh nothing else but show optional feedback
+        [sessionSel, classSel, termSel, subjectSelect].forEach(el => {
+            el.addEventListener('change', () => {
+                msgDiv.innerHTML = ''; // clear old messages
+                // optional preview (only in console)
+                const session = sessionSel.value;
+                const className = classSel.value;
+                const term = termSel.value;
+                const subject = subjectSelect.value;
+                if(subject) {
+                    const subjFile = formatSubjectForFile(subject);
+                    const exampleUrl = `${session}_${className.replace(/\s/g,'')}_${term}_${subjFile}.html`;
+                    console.log(`[Redirect Preview] ${exampleUrl}`);
+                }
+            });
+        });
+        
+        // initial check for logged user again
+        window.addEventListener('load', () => {
+            if (!sessionStorage.getItem('loggedUser')) window.location.href = 'index.html';
+            // set a default selected subject in case none is selected (first option is fine)
+            if (subjectSelect.options.length > 0 && subjectSelect.value === "") {
+                subjectSelect.selectedIndex = 0;
+            }
+            updatePreviewMessage();
+            // Additional flash message to show no password needed
+            setTimeout(() => {
+                msgDiv.innerHTML = "✨ Ready — select session, class, term & subject. Click 'Launch Lesson' for direct access.";
+                setTimeout(() => {
+                    if (msgDiv.innerHTML.includes("Ready")) msgDiv.innerHTML = "";
+                }, 3500);
+            }, 800);
+        });
+        
+        // ======================== LOGOUT FUNCTION ========================
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sessionStorage.removeItem('loggedUser');
+            sessionStorage.removeItem('currentLessonContext');
+            window.location.href = 'index.html';
+        });
+        
+        // ======================== ANTI-CHEAT MEASURES ========================
+        document.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            alert("Right-click is restricted on academic portal.");
+        });
+        
+        document.addEventListener('keydown', function (e) {
+            const key = e.key.toLowerCase();
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (key === 'i' || key === 'j')) || 
+                (e.ctrlKey && key === 'u') || (e.ctrlKey && key === 's' && e.target.tagName !== 'INPUT')) {
+                e.preventDefault();
+                alert("Developer tools are disabled on this portal.");
+            }
+        });
+        
+        // Update footer year
+        const footerYear = document.querySelector('.windows-activate p');
+        if (footerYear) footerYear.innerHTML = `&copy; ${new Date().getFullYear()} Canaanland Schools CBT · Simplified subject-based redirect (no week required)`;
+        
+        // Extra: ensure any leftover week password references removed completely.
+        console.log("Week and password selection removed — redirect uses Session_Class_Term_Subject.html");
+    </script>
+</body>
+</html>
