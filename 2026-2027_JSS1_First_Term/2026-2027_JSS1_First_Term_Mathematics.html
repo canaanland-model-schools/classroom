@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Mathematics · Canaanland Classroom | Lesson Notes</title>
+    <title>Mathematics · Canaanland Classroom</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
@@ -43,7 +43,9 @@
             position: absolute; top: 20px; right: 30px; background: #dc3545; border: none;
             color: white; padding: 10px 26px; border-radius: 40px; cursor: pointer;
             font-weight: 600; z-index: 10; display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s ease;
         }
+        .logout-btn:hover { background: #b52b3a; transform: scale(1.02); }
         .class-container {
             max-width: 1350px; width: 100%; background: rgba(255,255,255,0.92);
             backdrop-filter: blur(6px); border-radius: 52px; box-shadow: 0 30px 55px -18px rgba(0,35,65,0.45);
@@ -79,6 +81,7 @@
             padding: 34px 28px; text-align: center; transition: all 0.25s ease;
             box-shadow: 0 24px 36px -12px rgba(0, 30, 60, 0.2);
         }
+        .action-card:hover { transform: translateY(-6px); box-shadow: 0 28px 40px -14px #0b2f4e30; }
         .card-icon {
             font-size: 3.8rem; color: #0b2f4e; background: #e9f0fe; width: 100px; height: 100px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -120,7 +123,9 @@
         .close-viewer {
             background: #e03e3e; color: white; border: none; width: 48px; height: 48px;
             border-radius: 50%; font-size: 1.8rem; cursor: pointer;
+            transition: 0.2s;
         }
+        .close-viewer:hover { background: #b12a2a; }
         .pdf-frame { width: 100%; flex: 1; border: none; border-radius: 28px; background: #f0f4fa; }
         @media (max-width: 700px) {
             .class-header { padding: 1rem; }
@@ -132,6 +137,7 @@
 </head>
 <body>
 
+<!-- FIXED: Removed the extra --> 
 <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
 
 <div class="logo-container">
@@ -177,7 +183,8 @@
     </div>
     
     <div class="info-badge">
-        <i class="fas fa-folder-open"></i> <strong>PDF Location:</strong> <span id="urlPatternPreview">/classroom/lesson_notes_JSS1_First_Term/</span>
+        <i class="fas fa-folder-open"></i> <strong>Environment:</strong> <span id="envIndicator">Detecting...</span>
+        <i class="fas fa-file-pdf"></i> <strong>PDF Path:</strong> <span id="urlPatternPreview">-</span>
     </div>
 
     <div class="footer-note">
@@ -196,113 +203,297 @@
 </div>
 
 <script>
+    // ============================================================
+    // GLOBAL LOGOUT FUNCTION - Defined outside IIFE so it's accessible
+    // ============================================================
+    function handleLogout() {
+        // Clear all session data
+        sessionStorage.clear();
+        
+        // Detect environment (Local vs GitHub)
+        const isLocal = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.includes('xampp') ||
+                       window.location.hostname.includes('192.168.') ||
+                       window.location.hostname.includes('10.0.0.');
+        
+        const envName = isLocal ? 'LOCAL (XAMPP)' : 'GITHUB PAGES';
+        
+        // Determine correct redirect URL based on environment
+        let logoutUrl;
+        if (isLocal) {
+            // Local XAMPP environment
+            logoutUrl = 'D:/xampp/htdocs/class_room/index.html';
+        } else {
+            // GitHub Pages environment
+            logoutUrl = 'https://canaanland-model-schools.github.io/classroom/classroom-index.html';
+        }
+        
+        console.log(`🚪 Logging out from ${envName}. Redirecting to: ${logoutUrl}`);
+        
+        // Perform redirect
+        window.location.href = logoutUrl;
+    }
+
+    // Main initialization - runs when page loads
     (function() {
-        // --- User Session ---
+        // ============================================================
+        // 1. ENVIRONMENT DETECTION (Local XAMPP vs GitHub Pages)
+        // ============================================================
+        const isLocal = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.includes('xampp') ||
+                       window.location.hostname.includes('192.168.') ||
+                       window.location.hostname.includes('10.0.0.');
+        
+        const envName = isLocal ? '🏠 LOCAL (XAMPP)' : '🌐 GITHUB PAGES';
+        const envIndicator = document.getElementById('envIndicator');
+        if (envIndicator) envIndicator.innerHTML = envName;
+        
+        // ============================================================
+        // 2. USER SESSION MANAGEMENT
+        // ============================================================
         let loggedUser = { username: 'Student', image: 'default-avatar.png' };
         try {
             const stored = sessionStorage.getItem('loggedUser');
-            if (stored) loggedUser = JSON.parse(stored);
-        } catch(e) {}
-        document.getElementById('userNameDisplay').textContent = loggedUser.username || 'Student';
+            if (stored) {
+                loggedUser = JSON.parse(stored);
+                console.log('User loaded:', loggedUser.username);
+            }
+        } catch(e) {
+            console.warn('Error loading user session:', e);
+        }
+        
+        // Update user display
+        const userNameSpan = document.getElementById('userNameDisplay');
+        if (userNameSpan) userNameSpan.textContent = loggedUser.username || 'Student';
+        
         const imgEl = document.getElementById('studentImg');
-        if (loggedUser.image) imgEl.src = `img/${loggedUser.image}`;
-        imgEl.onerror = () => { imgEl.src = `https://ui-avatars.com/api/?background=f5b81b&color=0b2f4e&name=${loggedUser.username || 'Student'}`; };
-
-        // --- Lesson Context ---
-        let context = { session: '2026-2027', className: 'JSS1', term: 'First_Term', subject: 'Mathematics' };
+        if (imgEl) {
+            if (loggedUser.image) {
+                imgEl.src = `img/${loggedUser.image}`;
+            }
+            imgEl.onerror = () => { 
+                imgEl.src = `https://ui-avatars.com/api/?background=f5b81b&color=0b2f4e&name=${encodeURIComponent(loggedUser.username || 'Student')}&size=46`;
+            };
+        }
+        
+        // ============================================================
+        // 3. LESSON CONTEXT (Session, Class, Term, Subject)
+        // ============================================================
+        let context = { 
+            session: '2026-2027', 
+            className: 'JSS1', 
+            term: 'First_Term', 
+            subject: 'Mathematics' 
+        };
+        
         const storedCtx = sessionStorage.getItem('currentLessonContext');
         if (storedCtx) {
-            try { Object.assign(context, JSON.parse(storedCtx)); } catch(e) {}
+            try { 
+                Object.assign(context, JSON.parse(storedCtx)); 
+                console.log('Lesson context loaded:', context);
+            } catch(e) { console.warn(e); }
         }
-        document.getElementById('awarenessHeading').innerHTML = `<span>${context.session}</span> ${context.className} · ${context.term.replace('_',' ')} · ${context.subject}`;
-        document.getElementById('pdfTitle').innerText = `${context.session} ${context.className} ${context.subject}`;
-
-        // --- CRITICAL: PDF Path for GitHub ---
-        // Use the exact GitHub URL structure you provided
-        const pdfBaseName = `${context.session}_${context.className}_${context.term}_${context.subject}.pdf`;
-        // FIXED: The base URL for your PDFs on GitHub
-        const pdfBaseUrl = 'https://canaanland-model-schools.github.io/classroom/lesson_notes_JSS1_First_Term/';
-        const pdfFullUrl = pdfBaseUrl + pdfBaseName;
         
-        // Also try alternative names (without session prefix, with underscores, etc.)
-        const alternativeNames = [
-            `${context.className}_${context.subject}_${context.term}.pdf`,
-            `${context.subject}_${context.term}.pdf`,
-            `JSS1_Mathematics_First_Term.pdf`,
-            `Mathematics_First_Term.pdf`
-        ];
-        const candidateUrls = [pdfFullUrl, ...alternativeNames.map(name => pdfBaseUrl + name)];
+        // Update UI with context
+        const displayTerm = context.term.replace(/_/g, ' ');
+        const awarenessHeading = document.getElementById('awarenessHeading');
+        if (awarenessHeading) {
+            awarenessHeading.innerHTML = `<span>${context.session}</span> ${context.className} · ${displayTerm} · ${context.subject}`;
+        }
         
-        document.getElementById('urlPatternPreview').innerHTML = `<code>${pdfFullUrl}</code><br><span style="font-size:0.7rem;">(Upload your PDF here with exact filename)</span>`;
-
-        // Helper to check if file exists
+        const pdfTitle = document.getElementById('pdfTitle');
+        if (pdfTitle) {
+            pdfTitle.innerText = `${context.session} ${context.className} ${context.subject} Lesson Notes`;
+        }
+        
+        // ============================================================
+        // 4. PDF FILE PATH CONSTRUCTION
+        // ============================================================
+        const cleanSubject = context.subject.replace(/ /g, '_');
+        const pdfBaseName = `${context.session}_${context.className}_${context.term}_${cleanSubject}.pdf`;
+        
+        let candidateUrls = [];
+        
+        if (isLocal) {
+            const localBasePaths = [
+                'D:/xampp/htdocs/class_room/lesson_notes_JSS1_First_Term/',
+                '/class_room/lesson_notes_JSS1_First_Term/',
+                '../lesson_notes_JSS1_First_Term/',
+                'lesson_notes_JSS1_First_Term/',
+                './lesson_notes_JSS1_First_Term/'
+            ];
+            localBasePaths.forEach(base => {
+                candidateUrls.push(base + pdfBaseName);
+            });
+        } else {
+            const gitHubBase = 'https://canaanland-model-schools.github.io/classroom/lesson_notes_JSS1_First_Term/';
+            candidateUrls.push(gitHubBase + pdfBaseName);
+            
+            const altNames = [
+                `${context.className}_${cleanSubject}_${context.term}.pdf`,
+                `${cleanSubject}_${context.term}.pdf`,
+                `${context.className}_${cleanSubject}.pdf`,
+                `${cleanSubject}.pdf`
+            ];
+            altNames.forEach(name => {
+                candidateUrls.push(gitHubBase + name);
+            });
+        }
+        
+        const primaryPath = isLocal ? 
+            `D:/xampp/htdocs/class_room/lesson_notes_JSS1_First_Term/${pdfBaseName}` :
+            `https://canaanland-model-schools.github.io/classroom/lesson_notes_JSS1_First_Term/${pdfBaseName}`;
+        
+        const urlPreview = document.getElementById('urlPatternPreview');
+        if (urlPreview) urlPreview.innerHTML = `<code>${primaryPath}</code>`;
+        
+        // ============================================================
+        // 5. PDF EXISTENCE CHECKER
+        // ============================================================
         async function fileExists(url) {
             try {
-                const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const res = await fetch(url, { 
+                    method: 'HEAD', 
+                    cache: 'no-store', 
+                    signal: controller.signal 
+                });
+                clearTimeout(timeoutId);
                 return res.ok;
-            } catch { return false; }
+            } catch (err) {
+                return false;
+            }
         }
-
+        
         async function findPdf() {
             for (const url of candidateUrls) {
-                if (await fileExists(url)) return url;
+                try {
+                    const exists = await fileExists(url);
+                    if (exists) {
+                        console.log(`✅ PDF found at: ${url}`);
+                        return url;
+                    }
+                } catch (e) {
+                    continue;
+                }
             }
             return null;
         }
-
+        
+        // ============================================================
+        // 6. DOM ELEMENTS AND EVENT HANDLERS
+        // ============================================================
         const viewBtn = document.getElementById('viewPdfBtn');
         const downloadBtn = document.getElementById('downloadPdfBtn');
         const modal = document.getElementById('pdfViewerModal');
         const closeModal = document.getElementById('closePdfViewer');
         const pdfFrame = document.getElementById('pdfViewerFrame');
         const feedbackDiv = document.getElementById('globalFeedback');
-
+        
         let cachedPdf = null;
+        
+        // Initial PDF check
         findPdf().then(url => {
             cachedPdf = url;
-            if (url) {
-                feedbackDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✅ PDF is accessible! Ready to view/download.`;
-            } else {
-                feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ⚠️ PDF not found. Please upload the file to: <strong>${pdfBaseUrl}</strong><br>Required filename: <code>${pdfBaseName}</code>`;
+            if (feedbackDiv) {
+                if (url) {
+                    feedbackDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✅ PDF is accessible! Environment: ${envName}<br>📄 Ready to view/download.`;
+                } else {
+                    feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ⚠️ PDF not found in ${envName}.<br><strong>Expected location:</strong> ${primaryPath}<br><strong>Required filename:</strong> ${pdfBaseName}`;
+                }
+            }
+        }).catch(err => {
+            if (feedbackDiv) {
+                feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ⚠️ Unable to check PDF. Please ensure file exists at: ${primaryPath}`;
             }
         });
-
-        viewBtn.onclick = async () => {
-            let pdf = cachedPdf;
-            if (!pdf) pdf = await findPdf();
-            if (pdf) {
-                pdfFrame.src = pdf;
-                modal.style.display = 'flex';
-                feedbackDiv.innerHTML = `<i class="fas fa-file-pdf"></i> ✅ ${context.subject} notes opened.`;
-            } else {
-                feedbackDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ PDF missing. Upload to: ${pdfBaseUrl}${pdfBaseName}`;
-            }
-        };
-
-        downloadBtn.onclick = async () => {
-            let pdf = cachedPdf;
-            if (!pdf) pdf = await findPdf();
-            if (pdf) {
-                const a = document.createElement('a');
-                a.href = pdf;
-                a.download = pdfBaseName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                feedbackDiv.innerHTML = `<i class="fas fa-download"></i> Download started: ${pdfBaseName}`;
-            } else {
-                feedbackDiv.innerHTML = `<i class="fas fa-times-circle"></i> Cannot download: file missing.`;
-            }
-        };
-
-        closeModal.onclick = () => { modal.style.display = 'none'; pdfFrame.src = ''; };
-        window.onclick = (e) => { if (e.target === modal) { modal.style.display = 'none'; pdfFrame.src = ''; } };
         
-        // Logout
-        document.getElementById('logoutBtn').onclick = () => {
-            sessionStorage.clear();
-            window.location.href = 'index.html';
-        };
+        // View PDF Handler
+        if (viewBtn) {
+            viewBtn.onclick = async () => {
+                if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Locating PDF...`;
+                let pdf = cachedPdf;
+                if (!pdf) {
+                    pdf = await findPdf();
+                    cachedPdf = pdf;
+                }
+                if (pdf && modal && pdfFrame) {
+                    pdfFrame.src = pdf;
+                    modal.style.display = 'flex';
+                    if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-file-pdf"></i> ✅ ${context.subject} notes opened successfully.`;
+                } else if (feedbackDiv) {
+                    feedbackDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ PDF missing. Please ensure file exists at:<br><code>${primaryPath}</code>`;
+                }
+            };
+        }
+        
+        // Download PDF Handler
+        if (downloadBtn) {
+            downloadBtn.onclick = async () => {
+                if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Preparing download...`;
+                let pdf = cachedPdf;
+                if (!pdf) {
+                    pdf = await findPdf();
+                    cachedPdf = pdf;
+                }
+                if (pdf) {
+                    try {
+                        const a = document.createElement('a');
+                        a.href = pdf;
+                        a.download = pdfBaseName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-download"></i> ✅ Download started: ${pdfBaseName}`;
+                    } catch (err) {
+                        if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Download issue. Try right-click + "Save link as..."`;
+                    }
+                } else if (feedbackDiv) {
+                    feedbackDiv.innerHTML = `<i class="fas fa-times-circle"></i> Cannot download: PDF file missing at:<br><code>${primaryPath}</code>`;
+                }
+            };
+        }
+        
+        // Modal Close Handlers
+        if (closeModal) {
+            closeModal.onclick = () => { 
+                if (modal) modal.style.display = 'none'; 
+                if (pdfFrame) pdfFrame.src = ''; 
+            };
+        }
+        
+        if (window) {
+            window.onclick = (e) => { 
+                if (e.target === modal && modal) { 
+                    modal.style.display = 'none'; 
+                    if (pdfFrame) pdfFrame.src = ''; 
+                } 
+            };
+        }
+        
+        // ============================================================
+        // 7. ATTACH LOGOUT HANDLER TO BUTTON
+        // ============================================================
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.onclick = handleLogout;
+            console.log('✅ Logout button attached successfully');
+        } else {
+            console.error('❌ Logout button not found in DOM');
+        }
+        
+        // ============================================================
+        // 8. CONSOLE LOGGING FOR DEBUGGING
+        // ============================================================
+        console.log(`📁 Environment: ${envName}`);
+        console.log(`📚 Class: ${context.className}, Term: ${context.term}, Subject: ${context.subject}`);
+        console.log(`📄 Looking for PDF: ${pdfBaseName}`);
+        console.log(`🔍 Candidate paths:`, candidateUrls);
+        console.log(`🚪 Logout will redirect to: ${isLocal ? 'D:/xampp/htdocs/class_room/index.html' : 'https://canaanland-model-schools.github.io/classroom/classroom-index.html'}`);
+        
     })();
 </script>
 </body>
