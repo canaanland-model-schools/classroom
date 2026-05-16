@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Canaanland Classroom with Audio Learning</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- PDF.js library for text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body {
+            min-height: 100vh;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f4f9ff;
+            position: relative;
+            z-index: 1;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('img/Ctemplogo.png') no-repeat center center;
+            background-size: 300px 300px;
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .logo-container { display: flex; justify-content: center; margin-bottom: 15px; position: relative; z-index: 2; }
+        .logo {
+            width: 90px; height: 90px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid #f5b81b; box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .logo img { width: 80px; height: 80px; object-fit: contain; border-radius: 50%; }
+        .logout-btn {
+            position: absolute; top: 20px; right: 30px; background: #dc3545; border: none;
+            color: white; padding: 10px 26px; border-radius: 40px; cursor: pointer;
+            font-weight: 600; z-index: 10; display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .logout-btn:hover { background: #b52b3a; transform: scale(1.02); }
+        .class-container {
+            max-width: 1350px; width: 100%; background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(6px); border-radius: 52px; box-shadow: 0 30px 55px -18px rgba(0,35,65,0.45);
+            overflow: hidden; position: relative; z-index: 2;
+        }
+        .class-header {
+            background: linear-gradient(135deg, #0b2f4e 0%, #1c4e6e 100%);
+            color: white; padding: 1.2rem 2.5rem; display: flex; align-items: center;
+            flex-wrap: wrap; gap: 20px;
+        }
+        .logo-badge {
+            background: #f5b81b; width: 55px; height: 55px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: 700; color: #0b2f4e;
+        }
+        .school-title { font-size: 1.5rem; font-weight: 600; }
+        .user-greeting {
+            margin-left: auto; display: flex; align-items: center; gap: 14px;
+            background: rgba(255,255,255,0.12); padding: 6px 24px; border-radius: 60px;
+        }
+        .user-img { width: 46px; height: 46px; border-radius: 50%; border: 2px solid white; object-fit: cover; }
+        .username { font-weight: 700; font-size: 1.2rem; }
+        .awareness-section { background: #eef3fc; padding: 28px 30px; text-align: center; border-bottom: 2px solid #cfe2f5; }
+        .awareness-h1 {
+            font-size: 2rem; font-weight: 700; color: #0a2f4a; background: white;
+            display: inline-flex; flex-wrap: wrap; gap: 8px; padding: 15px 40px;
+            border-radius: 80px; box-shadow: 0 8px 18px rgba(0,40,70,0.1);
+        }
+        .awareness-h1 span { color: #c76e00; }
+        .cards-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; padding: 50px 30px; }
+        .action-card {
+            flex: 1 1 300px; max-width: 400px; background: white; border-radius: 44px;
+            padding: 34px 28px; text-align: center; transition: all 0.25s ease;
+            box-shadow: 0 24px 36px -12px rgba(0, 30, 60, 0.2);
+        }
+        .action-card:hover { transform: translateY(-6px); box-shadow: 0 28px 40px -14px #0b2f4e30; }
+        .card-icon {
+            font-size: 3.8rem; color: #0b2f4e; background: #e9f0fe; width: 100px; height: 100px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .card-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 16px; color: #1b3a5c; }
+        .card-description { font-size: 1rem; color: #2f577a; margin-bottom: 28px; }
+        .card-btn {
+            background: #0b2f4e; color: white; border: none; padding: 16px 20px;
+            border-radius: 60px; font-weight: 700; font-size: 1.05rem; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; transition: 0.2s;
+        }
+        .card-btn:hover { background: #1d537b; transform: scale(0.98); }
+        
+        /* Audio Player Card Styles */
+        .audio-controls {
+            margin-top: 20px;
+            width: 100%;
+        }
+        .progress-container {
+            background: #e0e7f0;
+            border-radius: 10px;
+            margin: 15px 0;
+            cursor: pointer;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: #0b2f4e;
+            width: 0%;
+            height: 100%;
+            transition: width 0.1s linear;
+        }
+        .audio-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        .audio-buttons button {
+            background: #f5b81b;
+            color: #0b2f4e;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+        }
+        .audio-buttons button:hover {
+            background: #ffcc4d;
+            transform: scale(1.02);
+        }
+        .extract-status {
+            font-size: 0.85rem;
+            color: #2f577a;
+            margin-top: 10px;
+            padding: 8px;
+            background: #eef3fc;
+            border-radius: 20px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #f5b81b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .feedback-message {
+            margin: 0 30px 20px; padding: 14px 24px; border-radius: 50px;
+            background: #e5f0ff; font-weight: 500; color: #015c8f;
+            border-left: 6px solid #f5b81b;
+        }
+        .info-badge {
+            background: #fef7e0; border-radius: 40px; padding: 12px 24px;
+            margin: 5px 30px 10px; text-align: center; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+        }
+        .footer-note { text-align: center; font-size: 0.85rem; color: #306f96; padding: 20px 30px; border-top: 1px solid #cde0ef; }
+        .pdf-viewer-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .pdf-viewer-content {
+            width: 92%; height: 90%; background: white; border-radius: 44px;
+            padding: 20px 24px; display: flex; flex-direction: column;
+        }
+        .pdf-viewer-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 18px; flex-wrap: wrap;
+        }
+        .close-viewer {
+            background: #e03e3e; color: white; border: none; width: 48px; height: 48px;
+            border-radius: 50%; font-size: 1.8rem; cursor: pointer;
+            transition: 0.2s;
+        }
+        .close-viewer:hover { background: #b12a2a; }
+        .pdf-frame { width: 100%; flex: 1; border: none; border-radius: 28px; background: #f0f4fa; }
+        
+        @media (max-width: 700px) {
+            .class-header { padding: 1rem; }
+            .school-title { font-size: 1rem; }
+            .awareness-h1 { font-size: 1.2rem; padding: 12px 20px; }
+            .logout-btn { top: 10px; right: 10px; padding: 6px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+
+<div class="logo-container">
+    <div class="logo">
+        <img id="schoolLogoImg" src="img/Ctemplogo.png" alt="School Logo" 
+             onerror="this.onerror=null; this.src='https://placehold.co/90x90?text=CMS'">
+    </div>
+</div>
+
+<div class="class-container">
+    <div class="class-header">
+        <div class="logo-badge"><i class="fas fa-chalkboard-user"></i></div>
+        <div class="school-title">CANAANLAND MODEL SCHOOLS</div>
+        <div class="user-greeting">
+            <img id="studentImg" class="user-img" src="img/default-avatar.png" alt="Student">
+            <span class="username" id="userNameDisplay">Student</span>
+        </div>
+    </div>
+
+    <div class="awareness-section">
+        <div class="awareness-h1" id="awarenessHeading">
+            <span>2026-2027</span> JSS2 · First Term · Mathematics
+        </div>
+    </div>
+
+    <div class="cards-row">
+        <!-- Card 1: View Lesson Notes -->
+        <div class="action-card">
+            <div class="card-icon"><i class="fas fa-book-open"></i></div>
+            <div class="card-title">View Lesson Notes</div>
+            <div class="card-description">Open the complete lesson notes in your browser.</div>
+            <button class="card-btn" id="viewPdfBtn"><i class="fas fa-eye"></i> View Notes</button>
+        </div>
+        
+        <!-- Card 2: Download PDF -->
+        <div class="action-card">
+            <div class="card-icon"><i class="fas fa-download"></i></div>
+            <div class="card-title">Download PDF</div>
+            <div class="card-description">Save a copy to your device for offline study.</div>
+            <button class="card-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download Lesson</button>
+        </div>
+        
+        <!-- Card 3: Audio Learning - Auto detect PDF & Read Aloud -->
+        <div class="action-card">
+            <div class="card-icon"><i class="fas fa-headphones"></i></div>
+            <div class="card-title">🎧 Audio Learning</div>
+            <div class="card-description">Listen to the lesson notes. PDF text is automatically extracted and read aloud.</div>
+            <div class="audio-controls">
+                <div class="audio-buttons">
+                    <button id="extractAndPlayBtn"><i class="fas fa-play"></i> Play Lesson Audio</button>
+                    <button id="stopAudioBtn"><i class="fas fa-stop"></i> Stop</button>
+                </div>
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="extract-status" id="extractStatus">
+                    <i class="fas fa-info-circle"></i> Ready to extract and play PDF content
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback-message" id="globalFeedback">
+        <i class="fas fa-info-circle"></i> Loading lesson information...
+    </div>
+    
+    <div class="info-badge">
+        <i class="fas fa-folder-open"></i> <strong>PDF Status:</strong> <span id="pdfStatus">Detecting...</span>
+        <i class="fas fa-file-pdf"></i> <strong>File:</strong> <span id="urlPatternPreview">-</span>
+    </div>
+
+    <div class="footer-note">
+        <p>© 2026 Canaanland Model Group of Schools · Digital Classroom with Audio Learning</p>
+    </div>
+</div>
+
+<div class="pdf-viewer-modal" id="pdfViewerModal">
+    <div class="pdf-viewer-content">
+        <div class="pdf-viewer-header">
+            <h3><i class="fas fa-file-pdf"></i> <span id="pdfTitle">Mathematics Lesson Notes</span></h3>
+            <button class="close-viewer" id="closePdfViewer">&times;</button>
+        </div>
+        <iframe class="pdf-frame" id="pdfViewerFrame" src="" title="PDF viewer"></iframe>
+    </div>
+</div>
+
+<script>
+    // Configure PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    
+    // ============================================================
+    // GLOBAL LOGOUT FUNCTION
+    // ============================================================
+    function handleLogout() {
+        sessionStorage.clear();
+        
+        const isLocal = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.includes('xampp') ||
+                       window.location.hostname.includes('192.168.') ||
+                       window.location.hostname.includes('10.0.0.');
+        
+        let logoutUrl;
+        if (isLocal) {
+            logoutUrl = 'D:/xampp/htdocs/class_room/index.html';
+        } else {
+            logoutUrl = 'https://canaanland-model-schools.github.io/classroom/classroom-index.html';
+        }
+        
+        console.log(`Logging out. Redirecting to: ${logoutUrl}`);
+        window.location.href = logoutUrl;
+    }
+
+    // ============================================================
+    // TEXT-TO-SPEECH WITH PROGRESS TRACKING
+    // ============================================================
+    let currentSpeech = null;
+    let currentTextChunks = [];
+    let currentChunkIndex = 0;
+    let isPlaying = false;
+    
+    function stopSpeech() {
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        isPlaying = false;
+        currentChunkIndex = 0;
+        currentTextChunks = [];
+        const progressBar = document.getElementById('progressBar');
+        if (progressBar) progressBar.style.width = '0%';
+    }
+    
+    function speakTextChunk(text, chunkIndex, totalChunks) {
+        return new Promise((resolve) => {
+            if (!isPlaying) {
+                resolve(false);
+                return;
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.pitch = 1.1;
+            utterance.rate = 0.9;
+            utterance.volume = 1;
+            
+            utterance.onend = () => {
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar && totalChunks > 0) {
+                    const percentage = ((chunkIndex + 1) / totalChunks) * 100;
+                    progressBar.style.width = `${percentage}%`;
+                }
+                resolve(true);
+            };
+            
+            utterance.onerror = () => {
+                console.warn('Speech error for chunk', chunkIndex);
+                resolve(false);
+            };
+            
+            window.speechSynthesis.speak(utterance);
+            currentSpeech = utterance;
+        });
+    }
+    
+    async function speakFullText(fullText, statusElement) {
+        stopSpeech();
+        
+        if (!fullText || fullText.trim().length === 0) {
+            if (statusElement) {
+                statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No text extracted from PDF.';
+            }
+            return;
+        }
+        
+        isPlaying = true;
+        
+        // Split text into smaller chunks (max 3000 chars per chunk for better speech handling)
+        const maxChunkSize = 3000;
+        const chunks = [];
+        for (let i = 0; i < fullText.length; i += maxChunkSize) {
+            chunks.push(fullText.substring(i, i + maxChunkSize));
+        }
+        
+        currentTextChunks = chunks;
+        currentChunkIndex = 0;
+        
+        if (statusElement) {
+            statusElement.innerHTML = `<i class="fas fa-volume-up"></i> 📖 Playing lesson audio (${chunks.length} parts)... <span class="loading-spinner"></span>`;
+        }
+        
+        for (let i = 0; i < chunks.length; i++) {
+            if (!isPlaying) break;
+            currentChunkIndex = i;
+            const shouldContinue = await speakTextChunk(chunks[i], i, chunks.length);
+            if (!shouldContinue) break;
+        }
+        
+        if (isPlaying && statusElement) {
+            statusElement.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Lesson playback completed!';
+        }
+        isPlaying = false;
+    }
+    
+    // ============================================================
+    // PDF TEXT EXTRACTION FUNCTION
+    // ============================================================
+    async function extractTextFromPDF(pdfUrl, statusElement, progressCallback) {
+        try {
+            statusElement.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Loading PDF document...';
+            
+            // Load the PDF document
+            const loadingTask = pdfjsLib.getDocument(pdfUrl);
+            const pdf = await loadingTask.promise;
+            
+            const totalPages = pdf.numPages;
+            statusElement.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Extracting text from ${totalPages} pages...`;
+            
+            let fullText = '';
+            
+            // Extract text from each page
+            for (let i = 1; i <= totalPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += `\n\n--- Page ${i} ---\n${pageText}`;
+                
+                if (progressCallback) {
+                    const progress = (i / totalPages) * 100;
+                    progressCallback(progress, i, totalPages);
+                }
+            }
+            
+            // Clean up the extracted text
+            fullText = fullText.replace(/\s+/g, ' ').trim();
+            
+            if (fullText.length === 0) {
+                throw new Error('No text could be extracted from the PDF');
+            }
+            
+            return fullText;
+        } catch (error) {
+            console.error('PDF extraction error:', error);
+            throw new Error(`Failed to extract text: ${error.message}`);
+        }
+    }
+    
+    // ============================================================
+    // PDF FILE DETECTION (from Mathematics code)
+    // ============================================================
+    let cachedPdfUrl = null;
+    let extractedText = null;
+    
+    const isLocal = window.location.hostname === 'localhost' || 
+                   window.location.hostname === '127.0.0.1' ||
+                   window.location.hostname.includes('xampp') ||
+                   window.location.hostname.includes('192.168.') ||
+                   window.location.hostname.includes('10.0.0.');
+    
+    let context = { 
+        session: '2026-2027', 
+        className: 'JSS2', 
+        term: 'First_Term', 
+        subject: 'Mathematics' 
+    };
+    
+    const storedCtx = sessionStorage.getItem('currentLessonContext');
+    if (storedCtx) {
+        try { 
+            Object.assign(context, JSON.parse(storedCtx)); 
+        } catch(e) { console.warn(e); }
+    }
+    
+    const displayTerm = context.term.replace(/_/g, ' ');
+    const awarenessHeading = document.getElementById('awarenessHeading');
+    if (awarenessHeading) {
+        awarenessHeading.innerHTML = `<span>${context.session}</span> ${context.className} · ${displayTerm} · ${context.subject}`;
+    }
+    
+    const cleanSubject = context.subject.replace(/ /g, '_');
+    const pdfBaseName = `${context.session}_${context.className}_${context.term}_${cleanSubject}.pdf`;
+    
+    let candidateUrls = [];
+    
+    if (isLocal) {
+        const localBasePaths = [
+            'D:/xampp/htdocs/class_room/lesson_notes_JSS2_First_Term/',
+            '/class_room/lesson_notes_JSS2_First_Term/',
+            '../lesson_notes_JSS2_First_Term/',
+            'lesson_notes_JSS2_First_Term/',
+            './lesson_notes_JSS2_First_Term/'
+        ];
+        localBasePaths.forEach(base => {
+            candidateUrls.push(base + pdfBaseName);
+        });
+    } else {
+        const gitHubBase = 'https://canaanland-model-schools.github.io/classroom/lesson_notes_JSS2_First_Term/';
+        candidateUrls.push(gitHubBase + pdfBaseName);
+        
+        const altNames = [
+            `${context.className}_${cleanSubject}_${context.term}.pdf`,
+            `${cleanSubject}_${context.term}.pdf`,
+            `${context.className}_${cleanSubject}.pdf`,
+            `${cleanSubject}.pdf`
+        ];
+        altNames.forEach(name => {
+            candidateUrls.push(gitHubBase + name);
+        });
+    }
+    
+    async function fileExists(url) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const res = await fetch(url, { method: 'HEAD', cache: 'no-store', signal: controller.signal });
+            clearTimeout(timeoutId);
+            return res.ok;
+        } catch (err) {
+            return false;
+        }
+    }
+    
+    async function findPdfUrl() {
+        for (const url of candidateUrls) {
+            try {
+                const exists = await fileExists(url);
+                if (exists) {
+                    console.log(`✅ PDF found at: ${url}`);
+                    return url;
+                }
+            } catch (e) {
+                continue;
+            }
+        }
+        return null;
+    }
+    
+    // ============================================================
+    // MAIN INITIALIZATION
+    // ============================================================
+    (function() {
+        // User session
+        let loggedUser = { username: 'Student', image: 'default-avatar.png' };
+        try {
+            const stored = sessionStorage.getItem('loggedUser');
+            if (stored) {
+                loggedUser = JSON.parse(stored);
+                console.log('User loaded:', loggedUser.username);
+            }
+        } catch(e) {
+            console.warn('Error loading user session:', e);
+        }
+        
+        const userNameSpan = document.getElementById('userNameDisplay');
+        if (userNameSpan) userNameSpan.textContent = loggedUser.username || 'Student';
+        
+        const imgEl = document.getElementById('studentImg');
+        if (imgEl) {
+            if (loggedUser.image) {
+                imgEl.src = `img/${loggedUser.image}`;
+            }
+            imgEl.onerror = () => { 
+                imgEl.src = `https://ui-avatars.com/api/?background=f5b81b&color=0b2f4e&name=${encodeURIComponent(loggedUser.username || 'Student')}&size=46`;
+            };
+        }
+        
+        const urlPreview = document.getElementById('urlPatternPreview');
+        const pdfStatusSpan = document.getElementById('pdfStatus');
+        const primaryPath = isLocal ? 
+            `D:/xampp/htdocs/class_room/lesson_notes_JSS2_First_Term/${pdfBaseName}` :
+            `https://canaanland-model-schools.github.io/classroom/lesson_notes_JSS2_First_Term/${pdfBaseName}`;
+        
+        if (urlPreview) urlPreview.innerHTML = `<code>${pdfBaseName}</code>`;
+        
+        // Find PDF on load
+        findPdfUrl().then(url => {
+            cachedPdfUrl = url;
+            if (pdfStatusSpan) {
+                if (url) {
+                    pdfStatusSpan.innerHTML = '✅ PDF Found';
+                } else {
+                    pdfStatusSpan.innerHTML = '⚠️ PDF Not Found';
+                }
+            }
+            
+            const feedbackDiv = document.getElementById('globalFeedback');
+            if (feedbackDiv) {
+                if (url) {
+                    feedbackDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✅ PDF is accessible! Ready for viewing, downloading, and audio playback.`;
+                } else {
+                    feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ⚠️ PDF not found. Expected: ${primaryPath}`;
+                }
+            }
+        }).catch(err => {
+            if (pdfStatusSpan) pdfStatusSpan.innerHTML = '❌ Detection Error';
+        });
+        
+        // ============================================================
+        // EVENT HANDLERS
+        // ============================================================
+        const viewBtn = document.getElementById('viewPdfBtn');
+        const downloadBtn = document.getElementById('downloadPdfBtn');
+        const modal = document.getElementById('pdfViewerModal');
+        const closeModal = document.getElementById('closePdfViewer');
+        const pdfFrame = document.getElementById('pdfViewerFrame');
+        const feedbackDiv = document.getElementById('globalFeedback');
+        const extractStatus = document.getElementById('extractStatus');
+        const playBtn = document.getElementById('extractAndPlayBtn');
+        const stopBtn = document.getElementById('stopAudioBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        
+        // View PDF Handler
+        if (viewBtn) {
+            viewBtn.onclick = async () => {
+                if (!cachedPdfUrl) {
+                    cachedPdfUrl = await findPdfUrl();
+                }
+                if (cachedPdfUrl && modal && pdfFrame) {
+                    pdfFrame.src = cachedPdfUrl;
+                    modal.style.display = 'flex';
+                    if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-file-pdf"></i> ✅ ${context.subject} notes opened successfully.`;
+                } else if (feedbackDiv) {
+                    feedbackDiv.innerHTML = `<i class="fas fa-times-circle"></i> ❌ PDF missing. Please ensure file exists.`;
+                }
+            };
+        }
+        
+        // Download PDF Handler
+        if (downloadBtn) {
+            downloadBtn.onclick = async () => {
+                if (!cachedPdfUrl) {
+                    cachedPdfUrl = await findPdfUrl();
+                }
+                if (cachedPdfUrl) {
+                    try {
+                        const a = document.createElement('a');
+                        a.href = cachedPdfUrl;
+                        a.download = pdfBaseName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-download"></i> ✅ Download started: ${pdfBaseName}`;
+                    } catch (err) {
+                        if (feedbackDiv) feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Download issue. Try right-click + "Save link as..."`;
+                    }
+                } else if (feedbackDiv) {
+                    feedbackDiv.innerHTML = `<i class="fas fa-times-circle"></i> Cannot download: PDF file missing.`;
+                }
+            };
+        }
+        
+        // Audio Play Button - Extract PDF and Play
+        if (playBtn) {
+            playBtn.onclick = async () => {
+                if (!cachedPdfUrl) {
+                    extractStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Locating PDF file...';
+                    cachedPdfUrl = await findPdfUrl();
+                }
+                
+                if (!cachedPdfUrl) {
+                    extractStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ❌ PDF file not found. Please upload the lesson PDF.';
+                    return;
+                }
+                
+                // Extract text from PDF
+                try {
+                    const updateProgress = (progress, pageNum, totalPages) => {
+                        extractStatus.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Extracting page ${pageNum}/${totalPages}... ${Math.round(progress)}%`;
+                    };
+                    
+                    const extractedFullText = await extractTextFromPDF(cachedPdfUrl, extractStatus, updateProgress);
+                    extractedText = extractedFullText;
+                    
+                    extractStatus.innerHTML = `<i class="fas fa-check-circle"></i> 📄 Extracted ${extractedText.length} characters. Starting audio playback...`;
+                    
+                    // Speak the extracted text
+                    await speakFullText(extractedText, extractStatus);
+                    
+                } catch (error) {
+                    console.error('Extraction error:', error);
+                    extractStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Error: ${error.message}. Make sure the PDF contains readable text.`;
+                }
+            };
+        }
+        
+        // Stop Button
+        if (stopBtn) {
+            stopBtn.onclick = () => {
+                stopSpeech();
+                if (extractStatus) {
+                    extractStatus.innerHTML = '<i class="fas fa-stop-circle"></i> Audio playback stopped.';
+                }
+            };
+        }
+        
+        // Progress bar click seeking (optional feature)
+        if (progressContainer) {
+            progressContainer.onclick = (e) => {
+                const rect = progressContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const width = rect.width;
+                const percentage = (x / width) * 100;
+                // Note: Full seeking support would require more complex implementation
+                extractStatus.innerHTML = '<i class="fas fa-info-circle"></i> Seeking not available for speech synthesis. Please stop and restart.';
+            };
+        }
+        
+        // Modal Close Handlers
+        if (closeModal) {
+            closeModal.onclick = () => { 
+                if (modal) modal.style.display = 'none'; 
+                if (pdfFrame) pdfFrame.src = ''; 
+            };
+        }
+        
+        if (window) {
+            window.onclick = (e) => { 
+                if (e.target === modal && modal) { 
+                    modal.style.display = 'none'; 
+                    if (pdfFrame) pdfFrame.src = ''; 
+                } 
+            };
+        }
+        
+        // Logout Handler
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.onclick = handleLogout;
+        }
+        
+        console.log(`📚 Class: ${context.className}, Term: ${context.term}, Subject: ${context.subject}`);
+        console.log(`📄 Looking for PDF: ${pdfBaseName}`);
+    })();
+</script>
+</body>
+</html>
