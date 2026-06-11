@@ -368,8 +368,8 @@
                         <label>🧪 Subject</label>
                         <select id="subjectSelect">
                             <option value="Mathematics">Mathematics</option>
-                            <!--<option value="English Language">English Language</option>
-                            <option value="Computer Studies">Computer Studies</option>-->
+                            <option value="Physics">Physics</option>
+                            <!--<option value="Computer Studies">Computer Studies</option>-->
                             <option value="Digital_Technology">Digital_Technology</option>
                         </select>
                     </div>
@@ -410,7 +410,7 @@
     const sessions = ['2025-2026', '2026-2027','2027-2028','2028-2029','2029-2030'];
     const classes = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
     const terms = ['First_Term', 'Second_Term', 'Third_Term'];
-    const subjects = ['Mathematics', 'English Language', 'Computer_Studies', 'Digital_Technology'];
+    const subjects = ['Mathematics', 'Physics', 'Computer_Studies', 'Digital_Technology'];
 
     // Populate password map
     sessions.forEach(s => {
@@ -421,7 +421,7 @@
                         let mapKey = `${s}_${c}_${t}_${sub}_Week${w}`;
                         let simplePass = '';
                         if (sub === 'Mathematics') simplePass = `math${w}`;
-                        else if (sub === 'English Language') simplePass = `eng${w}`;
+                        else if (sub === 'Physics') simplePass = `eng${w}`;
                         else if (sub === 'Computer Studies') simplePass = `comp${w}`;
                         else if (sub === 'Digital_Technology') simplePass = `digi${w}`;
                         weekPasswordMap.set(mapKey, simplePass);
